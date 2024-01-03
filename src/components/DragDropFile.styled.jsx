@@ -1,4 +1,4 @@
-import styled from " @emotion/styled"
+import styled from "@emotion/styled"
 
 export const DropArea = styled.div`
   width: 400px;

@@ -1,34 +1,67 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useDropzone} from 'react-dropzone';
+
 import { DropArea } from "./DragDropFile.styled";
 
 
 export const DragDropFile = () => {
-  const [file, setFile] = useState(null)
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = new FileReader;
 
-  if (typeof file==='undefined') return
+    file.onload = function() {
+      setPreview(file.result);
+    }
 
-  const formData = new FormData();
-  
-  formData.append = ('file', file);
-  formData.append('upload_preset', 'test-react-aploads');
-  formData.append('api_key', import.meta.env.CLOUDINARY_API_KEY);
+    file.readAsDataURL(acceptedFiles[0])
+  }, [])
 
-  const loadFile = async () => {
-    //https://console.cloudinary.com/console/c-ee656a49da6365fc6aecb471d8d51d/media_library/folders/c61dc5dbb289613fdb5b69ee144be5f5bb?view_mode=mosaic
-    const result = await fetch('https://api.cloudinary.com/v1_1/my-cloud-examples/image/upload', {
-      method: "POST",
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop
+  });
+
+  const [preview, setPreview] = useState(null);
+
+
+
+  async function handleOnSubmit(e) {
+    e.preventDefault();
+
+    if ( typeof acceptedFiles[0] === 'undefined' ) return;
+
+    const formData = new FormData();
+
+    formData.append('file', acceptedFiles[0]);
+    formData.append('upload_preset', '<Your Upload Preset>');
+    formData.append('api_key', import.meta.env.VITE_CLOUDINARY_API_KEY);
+
+    const results = await fetch('https://api.cloudinary.com/v1_1/<Your Cloud Name>/image/upload', {
+      method: 'POST',
       body: formData
-    })
-    .then(r => r.json());
+    }).then(r => r.json());
 
-    console.log(result);
+    console.log('results', results);
   }
-  loadFile();
 
   return (
     <>
       <DropArea>
         Area for drop file 
+
+        <div >
+              <input />
+              {
+                isDragActive ?
+                  <p>Drop the files here ...</p> :
+                  <p>Drag 'n' drop some files here, or click to select files</p>
+              }
+            </div>
+
+          {preview && (
+            <p className="mb-5">
+              <img src={preview} alt="Upload preview" />
+            </p>
+          )}
+
         <button type="file">Choose File</button>
         <button type="submit">Submit</button>
       </DropArea>
