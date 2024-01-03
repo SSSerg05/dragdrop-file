@@ -32,7 +32,7 @@ export const DragDropFile = () => {
 
     formData.append('file', acceptedFiles[0]);
     formData.append('upload_preset', '<Your Upload Preset>');
-    formData.append('api_key', import.meta.env.VITE_CLOUDINARY_API_KEY);
+    formData.append('api_key', import.meta.env.CLOUDINARY_API_KEY);
 
     const results = await fetch('https://api.cloudinary.com/v1_1/<Your Cloud Name>/image/upload', {
       method: 'POST',
@@ -47,8 +47,8 @@ export const DragDropFile = () => {
       <DropArea>
         Area for drop file 
 
-        <div >
-              <input />
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
               {
                 isDragActive ?
                   <p>Drop the files here ...</p> :
